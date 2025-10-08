@@ -8,7 +8,6 @@ uint64_t MidPrime(uint64_t og, int irange, int erange);
 uint64_t MaxPrime(uint64_t og, int irange, int erange);
 uint64_t TheoreticalMaxPrime(uint64_t og, int irange, int erange);
 bool is_prime(uint64_t n);
-using namespace std;
 
 int counter = 0;
 int tested_counter = 0;
@@ -16,7 +15,7 @@ int tested_counter = 0;
 uint64_t Poffset(const uint64_t& use, bool& found_prime)
 {
     uint64_t list[18] = { 1,5,11,13,17,19,23,25,29,31,37,41,43,47,53,59,61,67 };
-    vector<uint64_t> usable;
+    std::vector<uint64_t> usable;
 
     for (const uint64_t& num : list)
     {
@@ -25,13 +24,13 @@ uint64_t Poffset(const uint64_t& use, bool& found_prime)
             usable.push_back(num);
             if (is_prime(use + num))
             {
-                cout << "Prime: " << (use + num) << '\n';
+                std::cout << "Prime: " << (use + num) << '\n';
                 found_prime = true;
                 return (use + num);
             }
         }
     }
-    cout << "Composite: " << (use + usable[0]) << '\n';
+    std::cout << "Composite: " << (use + usable[0]) << '\n';
     found_prime = false;
     return use + usable[0];
 }
@@ -40,7 +39,7 @@ uint64_t Poffset(const uint64_t& use, bool& found_prime)
 uint64_t Noffset(const uint64_t& use, bool& found_prime)
 {
     uint64_t list[18] = { 1,5,11,13,17,19,23,25,29,31,37,41,43,47,53,59,61,67 };
-    vector<uint64_t> usable;
+    std::vector<uint64_t> usable;
 
     for (const uint64_t& num : list)
     {
@@ -49,17 +48,18 @@ uint64_t Noffset(const uint64_t& use, bool& found_prime)
             usable.push_back(num);
             if (is_prime(use - num))
             {
-                cout << "Prime: " << (use - num) << '\n';
+                std::cout << "Prime: " << (use - num) << '\n';
                 found_prime = true;
                 return (use - num);
             }
         }
     }
 
-    cout << "Composite: " << (use - usable[0]) << '\n';
+    std::cout << "Composite: " << (use - usable[0]) << '\n';
     found_prime = false;
     return use - usable[0];
 }
+
 bool is_prime(uint64_t n) {
     if (n < 2) return false;
     if (n == 2 || n == 3) return true;
@@ -73,7 +73,6 @@ bool is_prime(uint64_t n) {
     return true;
 }
 
-
 uint64_t ModPrime(uint64_t og, const uint64_t& irange, const uint64_t& erange)
 {
     uint64_t no = 0;
@@ -84,19 +83,20 @@ uint64_t ModPrime(uint64_t og, const uint64_t& irange, const uint64_t& erange)
         neg = 6 * i - 13;
         if (is_prime(pos))
         {
-            cout << "Prime: " << pos << '\n';
+            std::cout << "Prime: " << pos << '\n';
             ++no;
         }
-        else cout << "Composite: " << pos << '\n';
+        else std::cout << "Composite: " << pos << '\n';
         if (is_prime(neg))
         {
-            cout << "Prime: " << neg << '\n';
+            std::cout << "Prime: " << neg << '\n';
             ++no;
         }
-        else cout << "Composite: " << neg << '\n';
+        else std::cout << "Composite: " << neg << '\n';
     }
     return no;
 }
+
 uint64_t MidPrime(uint64_t og, const uint64_t& irange, const uint64_t& erange)
 {
     uint64_t no = 0;
@@ -108,20 +108,20 @@ uint64_t MidPrime(uint64_t og, const uint64_t& irange, const uint64_t& erange)
         neg = main - 1;
         if (is_prime(pos))
         {
-            cout << "Prime: " << pos << '\n';
+            std::cout << "Prime: " << pos << '\n';
             ++no;
         }
-        else cout << "Composite: " << pos << '\n';
+        else std::cout << "Composite: " << pos << '\n';
         if (is_prime(neg))
         {
-            cout << "Prime: " << neg << '\n';
+            std::cout << "Prime: " << neg << '\n';
             ++no;
         }
-        else cout << "Composite: " << neg << '\n';
+        else std::cout << "Composite: " << neg << '\n';
     }
     return no;
-
 }
+
 uint64_t TheoreticalMaxPrime(uint64_t og, const uint64_t& irange, const uint64_t& erange)
 {
     int primes_found = 0;
@@ -141,13 +141,13 @@ uint64_t TheoreticalMaxPrime(uint64_t og, const uint64_t& irange, const uint64_t
         total_attempts += 2;
     }
 
-    cout << "\nPrimes found: " << primes_found << "/" << total_attempts;
+    std::cout << "\nPrimes found: " << primes_found << "/" << total_attempts;
     if (total_attempts > 0) {
-        cout << " (" << (primes_found * 100) / total_attempts << "%)" << '\n';
+        std::cout << " (" << (primes_found * 100) / total_attempts << "%)" << '\n';
     }
-
     return primes_found;
 }
+
 uint64_t MaxPrime(uint64_t og, const uint64_t& irange, const uint64_t& erange)
 {
     uint64_t no = 0;
@@ -159,44 +159,44 @@ uint64_t MaxPrime(uint64_t og, const uint64_t& irange, const uint64_t& erange)
         neg = ((main - 13) % 5 == 0) ? main - 11 : main - 13;
         if (is_prime(pos))
         {
-            cout << "Prime: " << pos << '\n';
+            std::cout << "Prime: " << pos << '\n';
             ++no;
         }
-        else cout << "Composite: " << pos << '\n';
+        else std::cout << "Composite: " << pos << '\n';
         if (is_prime(neg))
         {
-            cout << "Prime: " << neg << '\n';
+            std::cout << "Prime: " << neg << '\n';
             ++no;
         }
-        else cout << "Composite: " << neg << '\n';
+        else std::cout << "Composite: " << neg << '\n';
     }
     return no;
-    return 0;
 }
+
 int main() {
     int choice;
     uint64_t start, end;
 
     while (true) {
-        cout << "\n=== PRIME GENERATOR ===" << '\n';
-        cout << "1. ModPrime (6k ± 13)" << '\n';
-        cout << "2. MidPrime (60k ± 1)" << '\n';
-        cout << "3. MaxPrime (42k ± {11,13})" << '\n';
-        cout << "4. TheoreticalMax (Dynamic 20-offset)" << '\n';
-        cout << "5. Exit" << '\n';
-        cout << "Choose method: ";
-        cin >> choice;
+        std::cout << "\n=== PRIME GENERATOR ===" << '\n';
+        std::cout << "1. ModPrime (6k ± 13)" << '\n';
+        std::cout << "2. MidPrime (60k ± 1)" << '\n';
+        std::cout << "3. MaxPrime (42k ± {11,13})" << '\n';
+        std::cout << "4. TheoreticalMax (Dynamic 20-offset)" << '\n';
+        std::cout << "5. Exit" << '\n';
+        std::cout << "Choose method: ";
+        std::cin >> choice;
 
         if (choice == 5) break;
         if (choice < 1 || choice > 4) {
-            cout << "Invalid choice!" << '\n';
+            std::cout << "Invalid choice!" << '\n';
             continue;
         }
 
-        cout << "Enter start k: ";
-        cin >> start;
-        cout << "Enter end k: ";
-        cin >> end;
+        std::cout << "Enter start k: ";
+        std::cin >> start;
+        std::cout << "Enter end k: ";
+        std::cin >> end;
 
         uint64_t primes_found, total_tested;
 
@@ -204,22 +204,22 @@ int main() {
         case 1:
             primes_found = ModPrime(0, start, end);
             total_tested = 2 * (end - start);
-            cout << "Primes: " << primes_found << "/" << total_tested;
-            cout << " (" << (primes_found * 100) / total_tested << "%)" << '\n';
+            std::cout << "Primes: " << primes_found << "/" << total_tested;
+            std::cout << " (" << (primes_found * 100) / total_tested << "%)" << '\n';
             break;
 
         case 2:
             primes_found = MidPrime(0, start, end);
             total_tested = 2 * (end - start);
-            cout << "Primes: " << primes_found << "/" << total_tested;
-            cout << " (" << (primes_found * 100) / total_tested << "%)" << '\n';
+            std::cout << "Primes: " << primes_found << "/" << total_tested;
+            std::cout << " (" << (primes_found * 100) / total_tested << "%)" << '\n';
             break;
 
         case 3:
             primes_found = MaxPrime(0, start, end);
             total_tested = 2 * (end - start);
-            cout << "Primes: " << primes_found << "/" << total_tested;
-            cout << " (" << (primes_found * 100) / total_tested << "%)" << '\n';
+            std::cout << "Primes: " << primes_found << "/" << total_tested;
+            std::cout << " (" << (primes_found * 100) / total_tested << "%)" << '\n';
             break;
 
         case 4:
@@ -232,10 +232,9 @@ int main() {
             break;
         }
         
-        cout << "\nPress Enter to continue...";
-        cin.ignore();
-        cin.get();
+        std::cout << "\nPress Enter to continue...";
+        std::cin.ignore();
+        std::cin.get();
     }
-    
     return 0;
 }
