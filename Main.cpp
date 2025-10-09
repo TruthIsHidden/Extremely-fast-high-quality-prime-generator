@@ -61,7 +61,7 @@ uint64_t Noffset(uint64_t no, bool& found_prime)
     found_prime = false; 
     return use - usable[0];
 }
-bool is_prime(uint64_t n) {
+/*bool is_prime(uint64_t n) {
     if (n < 2) return false;
     if (n == 2 || n == 3) return true;
     if (n % 2 == 0 || n % 3 == 0) return false;
@@ -72,10 +72,74 @@ bool is_prime(uint64_t n) {
             return false;
     }
     return true;
+}*/
+uint64_t mod_mul(uint64_t a, uint64_t b, uint64_t mod) {
+    uint64_t result = 0;
+    a %= mod;
+    while (b > 0) {
+        if (b & 1) {
+            result = (result + a) % mod;
+        }
+        a = (a * 2) % mod;
+        b >>= 1;
+    }
+    return result;
 }
 
+// Modular exponentiation: (base^exp) % mod
+uint64_t mod_pow(uint64_t base, uint64_t exp, uint64_t mod) {
+    uint64_t result = 1;
+    base %= mod;
+    while (exp > 0) {
+        if (exp & 1) {
+            result = mod_mul(result, base, mod);
+        }
+        base = mod_mul(base, base, mod);
+        exp >>= 1;
+    }
+    return result;
+}
 
-uint64_t ModPrime(uint64_t og, int irange, int erange)
+bool miller_rabin(uint64_t n, int rounds = 40) {
+    if (n < 2) return false;
+    if (n == 2 || n == 3) return true;
+    if (n % 2 == 0) return false;
+
+    uint64_t d = n - 1;
+    int r = 0;
+    while (d % 2 == 0) {
+        d /= 2;
+        r++;
+    }
+
+    uint64_t witnesses[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37 };
+    int num_witnesses = (rounds < 12) ? rounds : 12;
+
+    for (int i = 0; i < num_witnesses; i++) {
+        uint64_t a = witnesses[i];
+        if (a >= n) continue;
+
+        uint64_t x = mod_pow(a, d, n);
+        if (x == 1 || x == n - 1) continue;
+
+        bool composite = true;
+        for (int j = 0; j < r - 1; j++) {
+            x = mod_mul(x, x, n);
+            if (x == n - 1) {
+                composite = false;
+                break;
+            }
+        }
+        if (composite) return false;
+    }
+    return true;
+}
+
+bool is_prime(uint64_t n) {
+    return miller_rabin(n, 40);
+}
+
+uint64_t ModPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int no = 0;
     int pos, neg;
@@ -98,7 +162,7 @@ uint64_t ModPrime(uint64_t og, int irange, int erange)
     }
     return no;
 }
-uint64_t MidPrime(uint64_t og, int irange, int erange)
+uint64_t MidPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int no = 0;
     int pos, neg;
@@ -124,7 +188,7 @@ uint64_t MidPrime(uint64_t og, int irange, int erange)
     return 0;
 
 }
-uint64_t TheoreticalMaxPrime(uint64_t og, int irange, int erange)
+uint64_t TheoreticalMaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int primes_found = 0;
     int total_attempts = 0;
@@ -150,7 +214,7 @@ uint64_t TheoreticalMaxPrime(uint64_t og, int irange, int erange)
 
     return primes_found;
 }
-uint64_t MaxPrime(uint64_t og, int irange, int erange)
+uint64_t MaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int no = 0;
     int pos, neg;
@@ -173,7 +237,6 @@ uint64_t MaxPrime(uint64_t og, int irange, int erange)
         else cout << "Composite: " << neg << endl;
     }
     return no;
-    return 0;
 }
 int main() {
     int choice;
