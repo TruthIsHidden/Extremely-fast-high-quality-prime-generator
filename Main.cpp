@@ -21,7 +21,7 @@ uint64_t Poffset(uint64_t no, bool& found_prime)
     int limit = 18;
     for (int i = 0; i < limit; i++)
     {
-        if ((use + list[i]) % 5 != 0)
+        if ((use + list[i]) % 7 != 0)
         {
             usable.push_back(list[i]);
             if (is_prime(use + list[i]))
@@ -47,7 +47,7 @@ uint64_t Noffset(uint64_t no, bool& found_prime)
     int limit = 18;
     for (int i = 0; i < limit; i++)
     {
-        if ((use - list[i]) % 5 != 0)
+        if ((use - list[i]) % 7 != 0)
         {
             usable.push_back(list[i]);
             if (is_prime(use - list[i]))
@@ -197,7 +197,7 @@ uint64_t TheoreticalMaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
 
     for (uint64_t i = irange; i < erange; i++)
     {
-        uint64_t main = 42 * i;
+        uint64_t main = 30 * i;
         bool pos_is_prime = false;
         bool neg_is_prime = false;
 
