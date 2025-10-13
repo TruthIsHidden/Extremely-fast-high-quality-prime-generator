@@ -1,10 +1,10 @@
 PrimeSearch is an extremely efficient, fast, lightweight,
 and deterministic prime producing algorithm, it has
 100% efficiency for small to moderate k values,
-and even at the 10^11 scale maintained ~97% efficiency
+and even at the 10^18 scale maintained ~91% efficiency
 
 The algorithm itself is basically just a linear piecewise function.
-the initial k is multiplied with 42(product of 2, 3 and 7)
+the initial k is multiplied with 30(product of 2, 3 and 5)
 then simply put a suitable offset os chosen to add
 or subtract. (extremely simple explanation, resd code
 for proper explanation).
