@@ -16,10 +16,10 @@ int tested_counter = 0;
 uint64_t Poffset(uint64_t no, bool& found_prime)
 {
     uint64_t use = no;
-    uint64_t list[18] = { 1,5,11,13,17,19,23,25,29,31,37,41,43,47,53,59,61,67 };
+    uint64_t list[23] = { 1,5,11,13,17,19,23,25,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89 };
     vector<uint64_t> usable;
-
-    for (int i = 0; i < 18; i++)
+    int limit = 18;
+    for (int i = 0; i < limit; i++)
     {
         if ((use + list[i]) % 5 != 0)
         {
@@ -31,20 +31,19 @@ uint64_t Poffset(uint64_t no, bool& found_prime)
                 return (use + list[i]);
             }
         }
+          if (i == 17) limit = 23;
     }
     cout << "Composite: " << (use + usable[0]) << endl;
     found_prime = false;  
     return use + usable[0];
 }
-
-// FIXED: Same fix for negative offset
 uint64_t Noffset(uint64_t no, bool& found_prime)
 {
     uint64_t use = no;
-    uint64_t list[] = { 1,5,11,13,17,19,23,25,29,31,37,41,43,47,53,59,61,67 };
+    uint64_t list[23] = { 1,5,11,13,17,19,23,25,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89 };
     vector<uint64_t> usable;
-
-    for (int i = 0; i < 18; i++)
+    int limit = 18;
+    for (int i = 0; i < limit; i++)
     {
         if ((use - list[i]) % 5 != 0)
         {
@@ -56,6 +55,7 @@ uint64_t Noffset(uint64_t no, bool& found_prime)
                 return (use - list[i]);
             }
         }
+          if (i == 17) limit = 23;
     }
     cout << "Composite: " << (use - usable[0]) << endl;
     found_prime = false; 
@@ -166,7 +166,7 @@ uint64_t MidPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int no = 0;
     int pos, neg;
-    for (int i = irange;i < erange;i++)
+    for (uint64_t i = irange;i < erange;i++)
     {
         uint64_t main = 60 * i;
         pos = main + 1;
@@ -193,7 +193,7 @@ uint64_t TheoreticalMaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
     int primes_found = 0;
     int total_attempts = 0;
 
-    for (int i = irange; i < erange; i++)
+    for (uint64_t i = irange; i < erange; i++)
     {
         uint64_t main = 42 * i;
         bool pos_is_prime = false;
@@ -218,7 +218,7 @@ uint64_t MaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int no = 0;
     int pos, neg;
-    for (int i = irange;i < erange;i++)
+    for (uint64_t i = irange;i < erange;i++)
     {
         uint64_t main = 42 * i;
         pos = ((main + 13) % 5 == 0) ? main + 11 : main + 13;
@@ -302,5 +302,3 @@ int main() {
 
     return 0;
 }
-
-
