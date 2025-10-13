@@ -31,12 +31,14 @@ uint64_t Poffset(uint64_t no, bool& found_prime)
                 return (use + list[i]);
             }
         }
-          if (i == 17) limit = 23;
+          if (i == 17 && limit < 23) limit = 23;
     }
     cout << "Composite: " << (use + usable[0]) << endl;
     found_prime = false;  
     return use + usable[0];
 }
+
+// FIXED: Same fix for negative offset
 uint64_t Noffset(uint64_t no, bool& found_prime)
 {
     uint64_t use = no;
@@ -55,7 +57,7 @@ uint64_t Noffset(uint64_t no, bool& found_prime)
                 return (use - list[i]);
             }
         }
-          if (i == 17) limit = 23;
+          if (i == 17 && limit < 23) limit = 23;
     }
     cout << "Composite: " << (use - usable[0]) << endl;
     found_prime = false; 
@@ -166,7 +168,7 @@ uint64_t MidPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int no = 0;
     int pos, neg;
-    for (uint64_t i = irange;i < erange;i++)
+    for (int i = irange;i < erange;i++)
     {
         uint64_t main = 60 * i;
         pos = main + 1;
@@ -209,7 +211,7 @@ uint64_t TheoreticalMaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
 
     cout << "\nPrimes found: " << primes_found << "/" << total_attempts;
     if (total_attempts > 0) {
-        cout << " (" << (primes_found * 100) / total_attempts << "%)" << endl;
+        cout << " (" << (double)(primes_found * 100) / (double)total_attempts << "%)" << endl;
     }
 
     return primes_found;
@@ -218,7 +220,7 @@ uint64_t MaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int no = 0;
     int pos, neg;
-    for (uint64_t i = irange;i < erange;i++)
+    for (int i = irange;i < erange;i++)
     {
         uint64_t main = 42 * i;
         pos = ((main + 13) % 5 == 0) ? main + 11 : main + 13;
@@ -283,8 +285,8 @@ int main() {
         case 3:
             primes_found = MaxPrime(0, start, end);
             total_tested = 2 * (end - start);
-            cout << "Primes: " << primes_found << "/" << total_tested;
-            cout << " (" << (primes_found * 100) / total_tested << "%)" << endl;
+            cout << "Primes: " << (double)primes_found << "/" << (double)total_tested;
+            cout << " (" << (double)(primes_found * 100) / total_tested << "%)" << endl;
             break;
 
         case 4:
