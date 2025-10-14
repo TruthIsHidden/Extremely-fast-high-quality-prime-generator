@@ -1,3 +1,4 @@
+(All this but now with a ONE-WAY mode, yep you can generate primes now, and your input can not be known as long as your key isnt 1, or any dumb key atleast)
 PrimeSearch is an extremely efficient, fast, lightweight,
 and deterministic prime producing algorithm, it has
 100% efficiency for small to moderate k values,
