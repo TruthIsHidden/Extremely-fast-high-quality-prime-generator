@@ -27,10 +27,12 @@ uint64_t PRNG(uint64_t value);
 bool is_prime(uint64_t n);
 using namespace std;
 
-uint64_t list[25] = { // Yes
-  1, 7, 11, 13, 17, 19, 23, 29,
-  31, 37, 41, 43, 47, 49, 53, 59,
-  61, 67, 71, 73, 77, 79, 83, 89, 91
+uint64_t list[25] = {
+  1, 11, 13, 17, 19,
+  23, 29, 31, 37, 41,
+  43, 47, 53, 59, 61,
+  67, 71, 73, 79, 83,
+  89, 97, 101, 103, 107
 };
 typedef uint64_t u64;
 typedef unsigned __int128 u128; 
