@@ -27,6 +27,11 @@ uint64_t PRNG(uint64_t value);
 bool is_prime(uint64_t n);
 using namespace std;
 
+uint64_t list[25] = { // Yes
+  1, 7, 11, 13, 17, 19, 23, 29,
+  31, 37, 41, 43, 47, 49, 53, 59,
+  61, 67, 71, 73, 77, 79, 83, 89, 91
+};
 typedef uint64_t u64;
 typedef unsigned __int128 u128; 
 
@@ -35,6 +40,14 @@ static inline u64 prng64_from(u64 &state) {
     state = PRNG(state);
     return state;
 }
+
+static inline u64 derive_working_key(u64 key, u64 i, u64 irange, u64 erange) {
+    u64 x = key ^ 0x9E3779B97F4A7C15ULL ^ (i - irange) ^ ((erange - i) << 1);
+    x = PRNG(x);
+    x = PRNG(x);
+    return x ? x : 0xA5A5A5A5A5A5A5A5ULL; 
+}
+
 
 uint64_t rotate_left_64(uint64_t value, unsigned int positions) {
 	positions %= 64;
@@ -117,30 +130,21 @@ uint64_t PRNG(uint64_t value)
     return value;
 }
 
-u64 sample_k_wrapped(u64 K) {
+static inline u64 sample_k_wrapped_seeded(u64 K, u64 keyseed) {
     if (K == 0) return 0;
+    __uint128_t L = ( __uint128_t)K >> 1;
+    __uint128_t H = ( __uint128_t)K + ( (__uint128_t)K >> 1);
+    __uint128_t span = H - L + 1;
 
-    // Band [L, H] = [floor(0.5*K), floor(1.5*K)]
-    u128 L = (u128)K >> 1;                     // 0.5*K
-    u128 H = (u128)K + (u128)(K >> 1);         // 1.5*K (safe in 128-bit)
-    if (H < L) H = L;                          // (paranoia, should not happen)
-    u128 span = H - L + 1;                     // span ∈ [1, 2^64]
+    const __uint128_t U = ( (__uint128_t)std::numeric_limits<u64>::max() + 1);
+    __uint128_t t = (U / span) * span;
 
-    // Rejection sampling threshold to avoid modulo bias
-    const u128 U = (u128)std::numeric_limits<u64>::max() + 1; // 2^64
-    u128 t = (U / span) * span;                 // largest multiple of span below 2^64
-
-    // Seed a local PRNG state from K (distinct from K itself to decorrelate)
-    u64 state = PRNG(K ^ 0x9E3779B97F4A7C15ULL);
-
+    u64 state = PRNG(keyseed);
     u64 r;
-    do {
-        r = prng64_from(state);                 // get 64 random bits
-    } while ((u128)r >= t);                     // reject high tail to keep uniformity
+    do { state = PRNG(state); r = state; } while ( (__uint128_t)r >= t );
 
-    // Map to the band, centered ("wrapped") around K
-    u128 center = (u128)K - L;                  // 0 .. span-1
-    u128 off    = (center + ((u128)r % span)) % span;
+    __uint128_t center = ( __uint128_t)K - L; // 0..span-1
+    __uint128_t off = (center + ( (__uint128_t)r % span)) % span;
     return (u64)(L + off);
 }
 
@@ -151,9 +155,8 @@ int tested_counter = 0;
 uint64_t Poffset(uint64_t no, bool& found_prime)
 {
     uint64_t use = no;
-    uint64_t list[23] = { 1,5,11,13,17,19,23,25,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89 };
     vector<uint64_t> usable;
-    int limit = 18;
+    int limit = 25;
     for (int i = 0; i < limit; i++)
     {
         if ((use + list[i]) % 7 != 0)
@@ -166,20 +169,17 @@ uint64_t Poffset(uint64_t no, bool& found_prime)
                 return (use + list[i]);
             }
         }
-          if (i == 17 && limit < 23) limit = 23;
     }
     cout << "Composite: " << (use + usable[0]) << endl;
     found_prime = false;  
     return use + usable[0];
 }
 
-// FIXED: Same fix for negative offset
 uint64_t Noffset(uint64_t no, bool& found_prime)
 {
     uint64_t use = no;
-    uint64_t list[23] = { 1,5,11,13,17,19,23,25,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89 };
     vector<uint64_t> usable;
-    int limit = 18;
+    int limit = 25;
     for (int i = 0; i < limit; i++)
     {
         if ((use - list[i]) % 7 != 0)
@@ -192,7 +192,6 @@ uint64_t Noffset(uint64_t no, bool& found_prime)
                 return (use - list[i]);
             }
         }
-          if (i == 17 && limit < 23) limit = 23;
     }
     cout << "Composite: " << (use - usable[0]) << endl;
     found_prime = false; 
@@ -357,14 +356,11 @@ uint64_t TheoreticalMaxPrimeS(uint64_t og, uint64_t irange, uint64_t erange)
     int primes_found = 0;
     int total_attempts = 0;
     uint64_t seed = 0;
+    uint64_t workingKEY = 0;
     for (uint64_t i = irange; i < erange; i++)
     {
-        seed = i;
-        seed+= KEY;
-        seed = rotate_left_64(seed, 13);
-        seed^= KEY ^ i - (irange);
-        seed^= (erange - i);
-        u64 k = sample_k_wrapped(i ^ seed);
+        workingKEY = derive_working_key(KEY, i, irange, erange);
+        u64 k = sample_k_wrapped_seeded(i,workingKEY);
         u128 base128 = (u128)30 * (u128)k;                  
         u64 main = (u64)(base128 % std::numeric_limits<u64>::max());              
         bool pos_is_prime = false;
