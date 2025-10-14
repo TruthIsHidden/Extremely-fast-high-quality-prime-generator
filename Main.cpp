@@ -1,4 +1,3 @@
-
 #include <stdint.h>
 #include <stdbool.h>
 #include <vector>
@@ -31,6 +30,7 @@ using namespace std;
 typedef uint64_t u64;
 typedef unsigned __int128 u128; 
 
+uint64_t KEY = 0;
 static inline u64 prng64_from(u64 &state) {
     state = PRNG(state);
     return state;
@@ -356,15 +356,17 @@ uint64_t TheoreticalMaxPrimeS(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int primes_found = 0;
     int total_attempts = 0;
-
+    uint64_t seed = 0;
     for (uint64_t i = irange; i < erange; i++)
     {
-        u64 k = sample_k_wrapped(i);
-        u128 base128 = (u128)30 * (u128)k;                   // do the multiply in 128-bit
-        if (base128 > std::numeric_limits<u64>::max()) {     // guard: would overflow 64-bit
-         continue; // or handle however you want
-        }
-        u64 main = (u64)base128;              
+        seed = i;
+        seed+= KEY;
+        seed = rotate_left_64(seed, 13);
+        seed^= KEY ^ i - (irange);
+        seed^= (erange - i);
+        u64 k = sample_k_wrapped(i ^ seed);
+        u128 base128 = (u128)30 * (u128)k;                  
+        u64 main = (u64)(base128 % std::numeric_limits<u64>::max());              
         bool pos_is_prime = false;
         bool neg_is_prime = false;
 
@@ -465,6 +467,8 @@ int main() {
         case 5:
         counter = 0;
         tested_counter = 0;
+        cout << "Key: ";
+        cin >> KEY;
         primes_found = TheoreticalMaxPrimeS(0, start, end);
         break;
         }
