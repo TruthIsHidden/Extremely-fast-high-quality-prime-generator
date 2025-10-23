@@ -450,21 +450,20 @@ uint64_t MaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
     return no;
 }
 
-uint64_t NewConceptMax(uint64_t irange, uint64_t erange)
-{
-    uint64_t no = 0;
-    uint64_t counter = 0;
-    for(uint64_t i = irange; i < erange;i++)
-    {
-        no = Compute(i);
-        if (is_prime(no))
-        {
-            cout << "Prime: " << no << endl;
-            counter++;
+uint64_t NewConceptMax(uint64_t start, uint64_t count) {
+    uint64_t primes_found = 0;
+    uint64_t n = start;
+    for (uint64_t j = 0; j < count; ++j) {
+        uint64_t cand = Compute(n);      
+        if (is_prime(cand)) {
+            std::cout << "Prime: " << cand << "\n";
+            ++primes_found;
+        } else {
+            std::cout << "Composite: " << cand << "\n";
         }
-        else cout << "Composite: " << no << endl;
+        n = cand + 1;                   
     }
-    return counter;
+    return primes_found;
 }
 int main() {
     int choice;
