@@ -304,23 +304,20 @@ uint64_t Compute(uint64_t n) {
     uint32_t b[P], rem[P];
     for (size_t i = 0; i < P; ++i) {
         uint32_t p = S[i];
-        b[i] = (p - (uint32_t)(n % p)) % p; // forbidden remainder
-        rem[i] = 0;                         // t % p when t = 0
+        b[i] = (p - (uint32_t)(n % p)) % p;
+        rem[i] = 0;                        
     }
 
     for (uint64_t t = 0;; ++t) {
-        // Check forbidden classes; small primes first = early exits
         bool ok = true;
         for (size_t i = 0; i < P; ++i) {
             if (rem[i] == b[i]) { ok = false; break; }
         }
         if (ok) return n + t;
-
-        // Increment all remainders for t <- t+1
         for (size_t i = 0; i < P; ++i) {
             uint32_t p = S[i];
             uint32_t r = rem[i] + 1;
-            rem[i] = (r == p ? 0 : r); // branchless modulo p
+            rem[i] = (r == p ? 0 : r);
         }
     }
 }
