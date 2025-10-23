@@ -43,6 +43,15 @@ static inline u64 prng64_from(u64 &state) {
     return state;
 }
 
+uint64_t gcd_u64(uint64_t a, uint64_t b) {
+    while (b != 0) {
+        uint64_t t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
 static inline u64 derive_working_key(u64 key, u64 i, u64 irange, u64 erange) {
     u64 x = key ^ 0x9E3779B97F4A7C15ULL ^ (i - irange) ^ ((erange - i) << 1);
     x = PRNG(x);
@@ -277,6 +286,44 @@ bool is_prime(uint64_t n) {
     return miller_rabin(n, 40);
 }
 
+uint64_t Compute(uint64_t n) {
+    static const uint32_t S[] = {
+         2,  3,  5,  7, 11, 13, 17, 19, 23, 29,
+    31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+    73, 79, 83, 89, 97,101,103,107,109,113,
+   127,131,137,139,149,151,157,163,167,173,
+   179,181,191,193,197,199,211,223,227,229,
+   233,239,241,251,257,263,269,271,277,281,
+   283,293,307,311,313,317,331,337,347,349,
+   353,359,367,373,379,383,389,397,401,409,
+   419,421,431,433,439,443,449,457,461,463,
+   467,479,487,491,499
+    };
+    constexpr size_t P = sizeof(S)/sizeof(S[0]);
+
+    uint32_t b[P], rem[P];
+    for (size_t i = 0; i < P; ++i) {
+        uint32_t p = S[i];
+        b[i] = (p - (uint32_t)(n % p)) % p; // forbidden remainder
+        rem[i] = 0;                         // t % p when t = 0
+    }
+
+    for (uint64_t t = 0;; ++t) {
+        // Check forbidden classes; small primes first = early exits
+        bool ok = true;
+        for (size_t i = 0; i < P; ++i) {
+            if (rem[i] == b[i]) { ok = false; break; }
+        }
+        if (ok) return n + t;
+
+        // Increment all remainders for t <- t+1
+        for (size_t i = 0; i < P; ++i) {
+            uint32_t p = S[i];
+            uint32_t r = rem[i] + 1;
+            rem[i] = (r == p ? 0 : r); // branchless modulo p
+        }
+    }
+}
 uint64_t ModPrime(uint64_t og, uint64_t irange, uint64_t erange)
 {
     int no = 0;
@@ -405,6 +452,23 @@ uint64_t MaxPrime(uint64_t og, uint64_t irange, uint64_t erange)
     }
     return no;
 }
+
+uint64_t NewConceptMax(uint64_t irange, uint64_t erange)
+{
+    uint64_t no = 0;
+    uint64_t counter = 0;
+    for(uint64_t i = irange; i < erange;i++)
+    {
+        no = Compute(i);
+        if (is_prime(no))
+        {
+            cout << "Prime: " << no << endl;
+            counter++;
+        }
+        else cout << "Composite: " << no << endl;
+    }
+    return counter;
+}
 int main() {
     int choice;
     uint64_t start, end;
@@ -416,12 +480,13 @@ int main() {
         cout << "3. MaxPrime (42k ± {11,13})" << endl;
         cout << "4. TheoreticalMax (Dynamic 20-offset)" << endl;
         cout << "5. TheoreticalMax, ONEWAY-VARIANT" << endl;
-        cout << "6. Exit" << endl;
+        cout << "6. New CoPrime Approach" << endl;
+        cout << "7. Exit" << endl;
         cout << "Choose method: ";
         cin >> choice;
 
-        if (choice == 6) break;
-        if (choice < 1 || choice > 5) {
+        if (choice == 7) break;
+        if (choice < 1 || choice > 6) {
             cout << "Invalid choice!" << endl;
             continue;
         }
@@ -469,6 +534,22 @@ int main() {
         cin >> KEY;
         primes_found = TheoreticalMaxPrimeS(0, start, end);
         break;
+        
+        case 6: 
+    counter = 0;
+    tested_counter = 0;
+
+    uint64_t primes_found = NewConceptMax(start, end);
+    uint64_t total_tested = (end > start) ? (end - start) : 0;
+
+    if (total_tested == 0) {
+        cout << "No tests (start >= end)\n";
+    } else {
+        cout << "Primes: " << primes_found << "/" << total_tested
+             << " (" << fixed << setprecision(2)
+             << (100.0 * primes_found / total_tested) << "%)\n";
+    }
+    break;
         }
 
         cout << "\nPress Enter to continue...";
