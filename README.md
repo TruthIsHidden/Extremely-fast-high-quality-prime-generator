@@ -21,4 +21,5 @@ please provide credits and thats it, and feel free,
 to provide suggestions and such, consider sharing
 the algorithm.
 
+UPDATE: A NEW OPTION 6 IS MADE, MUCH FASTER, MUCH BETTER, AND MORE ALGEBRAICALLY AND MATHEMATICALLY TIGHT.
 Enjoy.
